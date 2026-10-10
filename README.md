@@ -75,7 +75,7 @@ Cuando publiques cambios, sube el número en `VERSION` dentro de `sw.js` para qu
 
 ```
 index.html              Estructura de la app
-css/tokens.css          Colores M3 (claro y oscuro) generados desde la semilla #5B4BC4
+css/tokens.css          Colores M3 (claro y oscuro) generados desde la semilla verde #2E7D32
 css/app.css             Componentes, formas, movimiento y diseño adaptable
 js/schedule.js          Horario del plan y fase actual (ayuno, ventana, intenso, descanso)
 js/streaks.js           Rachas, semanas y protectores calculados desde los registros
@@ -89,7 +89,7 @@ tests/logic.test.mjs    Pruebas de la lógica
 
 ### Cambiar los colores
 
-`css/tokens.css` se generó con [`@material/material-color-utilities`](https://github.com/material-foundation/material-color-utilities) (especificación 2025, esquema Vibrant) a partir del color semilla `#5B4BC4`. Para otro tono, genera los roles con esa librería o con [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/) y reemplaza las variables `--md-sys-color-*`.
+`css/tokens.css` se generó con [`@material/material-color-utilities`](https://github.com/material-foundation/material-color-utilities) (especificación 2025, esquema Fidelity) a partir del color semilla verde `#2E7D32`. Para otro tono, genera los roles con esa librería o con [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/) y reemplaza las variables `--md-sys-color-*`.
 
 ### Cambiar el horario
 

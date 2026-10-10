@@ -274,9 +274,9 @@ main {
   text-align: center;
 }
 .hero[data-kind="intense"], .hero[data-kind="refeed"] {
-  --hero-bg: var(--md-sys-color-tertiary-container);
-  --hero-fg: var(--md-sys-color-on-tertiary-container);
-  --ring: var(--md-sys-color-on-tertiary-container);
+  --hero-bg: var(--md-sys-color-primary);
+  --hero-fg: var(--md-sys-color-on-primary);
+  --ring: var(--md-sys-color-on-primary);
 }
 .hero[data-kind="window"] {
   --hero-bg: var(--md-sys-color-secondary-container);
@@ -528,8 +528,12 @@ main {
   box-shadow: 0 0 0 1px var(--md-sys-color-surface-container);
 }
 .tl-seg span { position: relative; z-index: 2; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
-.t-fast { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
-.t-intense { background: var(--md-sys-color-tertiary); color: var(--md-sys-color-on-tertiary); }
+.t-fast { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.t-intense {
+  background: repeating-linear-gradient(135deg, var(--md-sys-color-primary) 0 7px, color-mix(in srgb, var(--md-sys-color-primary) 78%, var(--md-sys-color-on-primary)) 7px 14px);
+  color: var(--md-sys-color-on-primary);
+}
+.t-intense span { background: var(--md-sys-color-primary); border-radius: 4px; }
 .t-eat { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 .t-free { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); }
 .tl-now { position: absolute; z-index: 1; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--app-fire); box-shadow: 0 0 0 2px var(--md-sys-color-surface-container); }
