@@ -1,0 +1,155 @@
+/* Generado con @material/material-color-utilities (spec 2025, vibrant) · semilla #5B4BC4 */
+:root {
+  color-scheme: light;
+  --md-sys-color-primary: #563ce0;
+  --md-sys-color-on-primary: #f5f0ff;
+  --md-sys-color-primary-container: #9f93ff;
+  --md-sys-color-on-primary-container: #1e0079;
+  --md-sys-color-secondary: #6947af;
+  --md-sys-color-on-secondary: #f8f0ff;
+  --md-sys-color-secondary-container: #dbc9ff;
+  --md-sys-color-on-secondary-container: #543199;
+  --md-sys-color-tertiary: #9a366a;
+  --md-sys-color-on-tertiary: #ffeff3;
+  --md-sys-color-tertiary-container: #ff8bc1;
+  --md-sys-color-on-tertiary-container: #62033e;
+  --md-sys-color-error: #b41340;
+  --md-sys-color-on-error: #ffefef;
+  --md-sys-color-error-container: #f74b6d;
+  --md-sys-color-on-error-container: #510017;
+  --md-sys-color-primary-fixed: #9f93ff;
+  --md-sys-color-primary-fixed-dim: #9182ff;
+  --md-sys-color-on-primary-fixed: #000000;
+  --md-sys-color-on-primary-fixed-variant: #270093;
+  --md-sys-color-tertiary-fixed: #ff8bc1;
+  --md-sys-color-tertiary-fixed-dim: #f17db4;
+  --md-sys-color-on-tertiary-fixed: #360020;
+  --md-sys-color-on-tertiary-fixed-variant: #6e1047;
+  --md-sys-color-surface: #fbf4ff;
+  --md-sys-color-surface-dim: #deccff;
+  --md-sys-color-surface-bright: #fbf4ff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f6edff;
+  --md-sys-color-surface-container: #efe3ff;
+  --md-sys-color-surface-container-high: #eaddff;
+  --md-sys-color-surface-container-highest: #e5d6ff;
+  --md-sys-color-on-surface: #34284e;
+  --md-sys-color-on-surface-variant: #62557e;
+  --md-sys-color-outline: #7e709b;
+  --md-sys-color-outline-variant: #b5a6d4;
+  --md-sys-color-inverse-surface: #13062c;
+  --md-sys-color-inverse-on-surface: #a595c3;
+  --md-sys-color-inverse-primary: #8e7fff;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --md-sys-color-primary: #ada3ff;
+  --md-sys-color-on-primary: #290099;
+  --md-sys-color-primary-container: #9f93ff;
+  --md-sys-color-on-primary-container: #1e0079;
+  --md-sys-color-secondary: #b390fe;
+  --md-sys-color-on-secondary: #300073;
+  --md-sys-color-secondary-container: #533098;
+  --md-sys-color-on-secondary-container: #dac7ff;
+  --md-sys-color-tertiary: #ff9ec9;
+  --md-sys-color-on-tertiary: #6d0f46;
+  --md-sys-color-tertiary-container: #fe87bf;
+  --md-sys-color-on-tertiary-container: #5f003b;
+  --md-sys-color-error: #ff6e84;
+  --md-sys-color-on-error: #490013;
+  --md-sys-color-error-container: #a70138;
+  --md-sys-color-on-error-container: #ffb2b9;
+  --md-sys-color-primary-fixed: #9f93ff;
+  --md-sys-color-primary-fixed-dim: #9182ff;
+  --md-sys-color-on-primary-fixed: #000000;
+  --md-sys-color-on-primary-fixed-variant: #270093;
+  --md-sys-color-tertiary-fixed: #ff8bc1;
+  --md-sys-color-tertiary-fixed-dim: #f17db4;
+  --md-sys-color-on-tertiary-fixed: #360020;
+  --md-sys-color-on-tertiary-fixed-variant: #6e1047;
+  --md-sys-color-surface: #13062c;
+  --md-sys-color-surface-dim: #13062c;
+  --md-sys-color-surface-bright: #34205b;
+  --md-sys-color-surface-container-lowest: #000000;
+  --md-sys-color-surface-container-low: #180a35;
+  --md-sys-color-surface-container: #1f103e;
+  --md-sys-color-surface-container-high: #261547;
+  --md-sys-color-surface-container-highest: #2d1b51;
+  --md-sys-color-on-surface: #ede0ff;
+  --md-sys-color-on-surface-variant: #b3a4d2;
+  --md-sys-color-outline: #7d6e9a;
+  --md-sys-color-outline-variant: #4e4169;
+  --md-sys-color-inverse-surface: #fef7ff;
+  --md-sys-color-inverse-on-surface: #5b4e77;
+  --md-sys-color-inverse-primary: #5a40e3;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-primary: #ada3ff;
+  --md-sys-color-on-primary: #290099;
+  --md-sys-color-primary-container: #9f93ff;
+  --md-sys-color-on-primary-container: #1e0079;
+  --md-sys-color-secondary: #b390fe;
+  --md-sys-color-on-secondary: #300073;
+  --md-sys-color-secondary-container: #533098;
+  --md-sys-color-on-secondary-container: #dac7ff;
+  --md-sys-color-tertiary: #ff9ec9;
+  --md-sys-color-on-tertiary: #6d0f46;
+  --md-sys-color-tertiary-container: #fe87bf;
+  --md-sys-color-on-tertiary-container: #5f003b;
+  --md-sys-color-error: #ff6e84;
+  --md-sys-color-on-error: #490013;
+  --md-sys-color-error-container: #a70138;
+  --md-sys-color-on-error-container: #ffb2b9;
+  --md-sys-color-primary-fixed: #9f93ff;
+  --md-sys-color-primary-fixed-dim: #9182ff;
+  --md-sys-color-on-primary-fixed: #000000;
+  --md-sys-color-on-primary-fixed-variant: #270093;
+  --md-sys-color-tertiary-fixed: #ff8bc1;
+  --md-sys-color-tertiary-fixed-dim: #f17db4;
+  --md-sys-color-on-tertiary-fixed: #360020;
+  --md-sys-color-on-tertiary-fixed-variant: #6e1047;
+  --md-sys-color-surface: #13062c;
+  --md-sys-color-surface-dim: #13062c;
+  --md-sys-color-surface-bright: #34205b;
+  --md-sys-color-surface-container-lowest: #000000;
+  --md-sys-color-surface-container-low: #180a35;
+  --md-sys-color-surface-container: #1f103e;
+  --md-sys-color-surface-container-high: #261547;
+  --md-sys-color-surface-container-highest: #2d1b51;
+  --md-sys-color-on-surface: #ede0ff;
+  --md-sys-color-on-surface-variant: #b3a4d2;
+  --md-sys-color-outline: #7d6e9a;
+  --md-sys-color-outline-variant: #4e4169;
+  --md-sys-color-inverse-surface: #fef7ff;
+  --md-sys-color-inverse-on-surface: #5b4e77;
+  --md-sys-color-inverse-primary: #5a40e3;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-shadow: #000000;
+}
+:root {
+  --app-fire: #bf5a00;
+  --app-on-fire: #ffffff;
+  --app-fire-container: #ffdbc8;
+  --app-on-fire-container: #522300;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --app-fire: #ffb68b;
+  --app-on-fire: #522300;
+  --app-fire-container: #753400;
+  --app-on-fire-container: #ffdbc8;
+  }
+}
+:root[data-theme="dark"] {
+  --app-fire: #ffb68b;
+  --app-on-fire: #522300;
+  --app-fire-container: #753400;
+  --app-on-fire-container: #ffdbc8;
+}
