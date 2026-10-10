@@ -1,6 +1,6 @@
 // Service worker: la app funciona sin conexión después de la primera visita.
 // Sube VERSION cada vez que publiques cambios para que los teléfonos tomen la nueva versión.
-const VERSION = 'ayuno-v1.1.0';
+const VERSION = 'ayuno-v1.2.0';
 const SHELL = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const SHELL = [
   './js/shapes.js',
   './manifest.webmanifest',
   './icons/favicon.svg',
+  './icons/favicon-48.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
 ];
