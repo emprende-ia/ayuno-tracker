@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bedtime,bolt,brightness_auto,calendar_view_week,check,close,dark_mode,delete,download,edit,emoji_events,expand_more,history,info,light_mode,local_fire_department,question_mark,restaurant,schedule,settings,shield,today,upload,weekend&display=block">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bedtime,bolt,brightness_auto,calendar_view_week,check,close,cloud_done,cloud_off,cloud_sync,dark_mode,delete,download,edit,emoji_events,expand_more,history,info,light_mode,local_fire_department,login,logout,question_mark,restaurant,schedule,settings,shield,sync_problem,today,upload,weekend&display=block">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/app.css">
   <script>
@@ -36,6 +36,7 @@
         <p id="subtitle"></p>
       </div>
       <div class="top-actions">
+        <button class="icon-btn sync-btn" id="sync-btn" type="button" data-act="settings" aria-label="Sincronización" hidden></button>
         <button class="icon-btn" id="theme-btn" type="button" data-act="theme" aria-label="Cambiar tema"></button>
         <button class="icon-btn" type="button" data-act="settings" aria-label="Ajustes"><span class="ms" aria-hidden="true">settings</span></button>
       </div>

@@ -133,3 +133,43 @@ test('ayuno intenso: viernes y sábado cumplidos', () => {
   const s = computeStats({ startDate: MON, days: done(d(4), d(5)) }, d(5));
   assert.equal(s.weeks[0].intense, true);
 });
+
+// ---------- Sincronización ----------
+import { mergeStates, syncSignature, normalize } from '../js/store.js';
+
+test('sincronizar: por cada día gana el cambio más reciente', () => {
+  const local = normalize({ startDate: MON, startDateU: 10, days: {
+    [d(0)]: { status: 'done', u: 100 },
+    [d(1)]: { status: 'missed', u: 300 },
+  } }, d(5));
+  const remote = { startDate: '2026-09-28', startDateU: 5, onboarded: true, days: {
+    [d(0)]: { status: 'missed', shield: true, u: 200 }, // más nuevo en la nube
+    [d(1)]: { status: 'done', u: 250 }, // más viejo que el local
+    [d(2)]: { status: 'done', u: 50 }, // solo existe en la nube
+  } };
+  const m = mergeStates(local, remote, d(5));
+  assert.deepEqual(m.days[d(0)], { status: 'missed', shield: true, u: 200 });
+  assert.equal(m.days[d(1)].status, 'missed');
+  assert.equal(m.days[d(2)].status, 'done');
+  assert.equal(m.startDate, MON); // la fecha local es más reciente
+});
+
+test('sincronizar: un borrado más reciente gana y se propaga', () => {
+  const local = normalize({ startDate: MON, days: { [d(0)]: { u: 500 } } }, d(5)); // lápida
+  const remote = { startDate: MON, days: { [d(0)]: { status: 'done', u: 400 } } };
+  const m = mergeStates(local, remote, d(5));
+  assert.equal(m.days[d(0)].status, undefined);
+  assert.equal(computeStats(m, d(1)).status[d(0)], 'pending'); // lunes es el día de gracia del martes
+});
+
+test('sincronizar: los registros viejos sin marca toman la hora de `at`', () => {
+  const s = normalize({ startDate: MON, days: { [d(0)]: { status: 'done', at: '2026-10-05T20:00:00.000Z' } } }, d(5));
+  assert.equal(s.days[d(0)].u, Date.parse('2026-10-05T20:00:00.000Z'));
+});
+
+test('sincronizar: firma igual cuando los datos son iguales', () => {
+  const a = normalize({ startDate: MON, days: { [d(0)]: { status: 'done', u: 1 }, [d(1)]: { status: 'missed', u: 2 } } }, d(5));
+  const b = normalize({ startDate: MON, days: { [d(1)]: { status: 'missed', u: 2 }, [d(0)]: { status: 'done', u: 1 } } }, d(5));
+  assert.equal(syncSignature(a), syncSignature(b));
+  assert.notEqual(syncSignature(a), syncSignature(mergeStates(a, { days: { [d(2)]: { status: 'done', u: 3 } } }, d(5))));
+});

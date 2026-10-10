@@ -4,6 +4,7 @@ import {
 } from './schedule.js';
 import { computeStats, MAX_SHIELDS } from './streaks.js';
 import { loadState, saveState, serialize, parseBackup } from './store.js';
+import { initSync, onSyncChange, syncInfo, notifyLocalChange, signIn, signOutSync, errorMessage } from './sync.js';
 import { ringPaths, cookie, pointOnRing } from './shapes.js';
 
 /* ---------- Estado ---------- */
@@ -27,6 +28,7 @@ const el = {
   sheet: $('#sheet'),
   snackbar: $('#snackbar'),
   themeBtn: $('#theme-btn'),
+  syncBtn: $('#sync-btn'),
 };
 
 /* ---------- Utilidades de texto ---------- */
@@ -134,6 +136,31 @@ function renderTopBar() {
   const dark = effectiveDark();
   el.themeBtn.innerHTML = icon(dark ? 'light_mode' : 'dark_mode');
   el.themeBtn.setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  renderSyncButton();
+}
+
+function syncLook(info = syncInfo()) {
+  if (info.status === 'unavailable' && info.error === 'preview') return null;
+  if (!info.user) return { icon: 'cloud_off', label: 'Sincronización desactivada. Abre Ajustes para iniciar sesión.', tone: 'off' };
+  return {
+    synced: { icon: 'cloud_done', label: 'Sincronizado', tone: 'ok' },
+    pending: { icon: 'cloud_sync', label: 'Subiendo cambios', tone: 'busy' },
+    connecting: { icon: 'cloud_sync', label: 'Sincronizando', tone: 'busy' },
+    loading: { icon: 'cloud_sync', label: 'Sincronizando', tone: 'busy' },
+    offline: { icon: 'cloud_off', label: 'Sin conexión. Tus cambios se suben cuando vuelva el internet.', tone: 'off' },
+    error: { icon: 'sync_problem', label: errorMessage(info.error), tone: 'error' },
+  }[info.status] || { icon: 'cloud_sync', label: 'Sincronizando', tone: 'busy' };
+}
+
+function renderSyncButton() {
+  const look = syncLook();
+  if (!el.syncBtn) return;
+  el.syncBtn.hidden = !look;
+  if (!look) return;
+  el.syncBtn.innerHTML = icon(look.icon, look.tone === 'ok' ? 'fill' : '');
+  el.syncBtn.dataset.tone = look.tone;
+  el.syncBtn.setAttribute('aria-label', look.label);
+  el.syncBtn.title = look.label;
 }
 
 function renderNav() {
@@ -168,6 +195,7 @@ function onboardingCard() {
     <h2 id="ob-title">Empieza tu registro</h2>
     <p>Tu racha cuenta desde hoy. Si ya ayunaste días de esta semana, puedes registrar desde el lunes.</p>
     <div class="btn-row"><button class="btn filled" type="button" data-act="onboard-today">Empezar hoy</button>${fromMonday}</div>
+    ${syncLook() && !syncInfo().user ? `<p class="muted small">¿Ya usas la app en otro dispositivo? <button class="link-btn" type="button" data-act="sign-in">Inicia sesión con Google</button> para traer tus registros.</p>` : ''}
   </section>`;
 }
 
@@ -499,6 +527,7 @@ function commit(mutate, opts) {
   const ok = saveState(state);
   stats = computeStats(state, today);
   render(opts);
+  notifyLocalChange();
   if (!ok) toast('No se pudo guardar en este navegador. Exporta una copia desde Ajustes.');
 }
 
@@ -511,6 +540,7 @@ function mark(k, status, shield = false) {
     rec.status = status;
     if (status === 'missed' && shield) rec.shield = true;
     rec.at = new Date().toISOString();
+    rec.u = Date.now();
     s.days[k] = rec;
   }, { focus: `[data-act="${status === 'done' ? 'yes' : 'no'}"][data-key="${k}"]` });
 
@@ -528,16 +558,15 @@ function clearDay(k) {
   commit((s) => {
     const rec = { ...(s.days[k] || {}) };
     delete rec.status; delete rec.shield; delete rec.at;
-    if (Object.keys(rec).length) s.days[k] = rec;
-    else delete s.days[k];
+    rec.u = Date.now(); // el borrado también se sincroniza
+    s.days[k] = rec;
   });
   toast('Registro borrado.', { action: 'Deshacer', onAction: () => restore(k, prev) });
 }
 
 function restore(k, prev) {
   commit((s) => {
-    if (prev) s.days[k] = prev;
-    else delete s.days[k];
+    s.days[k] = prev ? { ...prev, u: Date.now() } : { u: Date.now() };
   });
 }
 
@@ -622,6 +651,7 @@ function openSettings() {
     `<button type="button" role="radio" aria-checked="${t === v}" data-act="set-theme" data-value="${v}">${icon(ic)}<span>${txt}</span></button>`;
   openSheet(`
     <h2 class="sheet-title">Ajustes</h2>
+    <section class="set-group" id="sync-section" aria-live="polite">${syncSection()}</section>
     <section class="set-group">
       <h3>Tema</h3>
       <div class="segmented" role="radiogroup" aria-label="Tema">${opt('system', 'brightness_auto', 'Sistema')}${opt('light', 'light_mode', 'Claro')}${opt('dark', 'dark_mode', 'Oscuro')}</div>
@@ -633,7 +663,7 @@ function openSettings() {
     </section>
     <section class="set-group">
       <h3>Tus datos</h3>
-      <p class="muted small">Se guardan solo en este navegador. Exporta una copia para no perderlos o para pasarlos a otro dispositivo.</p>
+      <p class="muted small">${syncInfo().user ? 'Se guardan en este dispositivo y en tu cuenta. También puedes exportar una copia en archivo.' : 'Se guardan solo en este navegador. Inicia sesión para guardarlos en la nube, o exporta una copia en archivo.'}</p>
       <div class="btn-row">
         <button class="btn tonal" type="button" data-act="export">${icon('download')}Exportar copia</button>
         <button class="btn tonal" type="button" data-act="import">${icon('upload')}Importar copia</button>
@@ -642,6 +672,32 @@ function openSettings() {
       <button class="btn text danger" type="button" data-act="reset">${icon('delete')}Borrar todos los registros</button>
     </section>
   `, 'Ajustes');
+}
+
+function syncSection() {
+  const info = syncInfo();
+  const look = syncLook(info);
+  if (!look) {
+    return `<h3>Sincronización</h3><p class="muted small">${errorMessage('preview')}</p>`;
+  }
+  const err = info.error && info.error !== 'preview' ? `<p class="field-error">${esc(errorMessage(info.error))}</p>` : '';
+  if (!info.user) {
+    const loading = info.status === 'loading' || info.status === 'off';
+    return `<h3>Sincronización</h3>
+      <p class="muted small">Inicia sesión con Google para guardar tus registros en la nube y verlos en tu celular y tu computadora.</p>
+      <div class="btn-row"><button class="btn filled" type="button" data-act="sign-in" ${loading || info.status === 'unavailable' ? 'disabled' : ''}>${icon('login')}Iniciar sesión con Google</button></div>
+      ${info.status === 'unavailable' && info.error === 'sdk' ? `<p class="field-error">${esc(errorMessage('sdk'))}</p>` : err}`;
+  }
+  const u = info.user;
+  const initial = esc((u.name || u.email || '?').trim().charAt(0).toUpperCase());
+  const when = info.status === 'synced' && info.lastSync ? ` a las ${hhmm(new Date(info.lastSync))}` : '';
+  return `<h3>Sincronización</h3>
+    <div class="account">
+      <span class="avatar" aria-hidden="true">${initial}</span>
+      <div class="account-text"><p class="account-name">${esc(u.name || 'Tu cuenta')}</p><p class="muted small">${esc(u.email)}</p></div>
+    </div>
+    <p class="sync-line" data-tone="${look.tone}">${icon(look.icon, look.tone === 'ok' ? 'fill' : '')}<span>${esc(look.tone === 'ok' ? `Sincronizado${when}` : look.label)}</span></p>
+    <button class="btn text" type="button" data-act="sign-out">${icon('logout')}Cerrar sesión</button>`;
 }
 
 function openResetConfirm() {
@@ -784,11 +840,18 @@ document.addEventListener('click', (e) => {
       commit((s) => {
         if (!s.days[k]) return;
         delete s.days[k].lastMeal;
-        if (!Object.keys(s.days[k]).length) delete s.days[k];
+        s.days[k].u = Date.now();
       });
       toast(`Última comida: ${PLAN.lastMeal}.`);
       break;
     case 'settings': openSettings(); break;
+    case 'sign-in':
+      t.disabled = true;
+      signIn().catch(() => {}).finally(() => { t.disabled = false; });
+      break;
+    case 'sign-out':
+      signOutSync().then(() => toast('Sesión cerrada. Tus registros siguen en este dispositivo.'));
+      break;
     case 'theme':
       state.theme = effectiveDark() ? 'light' : 'dark';
       saveState(state);
@@ -807,15 +870,20 @@ document.addEventListener('click', (e) => {
     case 'reset': openResetConfirm(); break;
     case 'reset-confirm':
       closeSheet();
-      commit((s) => { s.days = {}; s.startDate = today; });
+      commit((s) => {
+        const now = Date.now();
+        for (const key of Object.keys(s.days)) s.days[key] = { u: now };
+        s.startDate = today;
+        s.startDateU = now;
+      });
       toast('Registros borrados. Tu registro empieza hoy.');
       break;
     case 'onboard-today':
-      commit((s) => { s.onboarded = true; s.startDate = today; });
+      commit((s) => { s.onboarded = true; s.startDate = today; s.startDateU = Date.now(); });
       toast('Listo. Tu racha cuenta desde hoy.');
       break;
     case 'onboard-monday':
-      commit((s) => { s.onboarded = true; s.startDate = mondayOf(today); });
+      commit((s) => { s.onboarded = true; s.startDate = mondayOf(today); s.startDateU = Date.now(); });
       toast('Registra los días que ya pasaron desde la pestaña Semana.');
       break;
     default: break;
@@ -836,10 +904,9 @@ document.addEventListener('submit', (e) => {
   const k = form.dataset.key;
   closeSheet();
   commit((s) => {
-    s.days[k] = { ...(s.days[k] || {}) };
+    s.days[k] = { ...(s.days[k] || {}), u: Date.now() };
     if (v === PLAN.lastMeal) delete s.days[k].lastMeal;
     else s.days[k].lastMeal = v;
-    if (!Object.keys(s.days[k]).length) delete s.days[k];
   });
   toast(`Última comida: ${v}.`);
 });
@@ -856,7 +923,7 @@ document.addEventListener('change', (e) => {
       e.target.value = state.startDate;
       return;
     }
-    commit((s) => { s.startDate = v; s.onboarded = true; });
+    commit((s) => { s.startDate = v; s.startDateU = Date.now(); s.onboarded = true; });
     toast(`Registro desde el ${dayLabel(v)}.`);
   }
   if (e.target.id === 'import-file') {
@@ -864,8 +931,15 @@ document.addEventListener('change', (e) => {
     if (!file) return;
     file.text().then((text) => {
       const next = parseBackup(text, today);
+      const now = Date.now();
+      // Lo importado gana sobre lo que haya en la nube; los días que ya no vienen se borran
+      for (const key of Object.keys(state.days)) if (!next.days[key]) next.days[key] = { u: now };
+      for (const key of Object.keys(next.days)) next.days[key].u = now;
+      next.startDateU = now;
+      next.theme = state.theme;
       state = next;
       saveState(state);
+      notifyLocalChange();
       stats = computeStats(state, today);
       applyTheme();
       closeSheet();
@@ -939,6 +1013,31 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) tick
 applyTheme();
 render();
 requestAnimationFrame(ringLoop);
+
+let wasSignedIn = false;
+onSyncChange((info) => {
+  renderSyncButton();
+  const section = $('#sync-section');
+  if (section && el.sheet.open) section.innerHTML = syncSection();
+  if (info.user && !wasSignedIn) toast(`Sesión iniciada${info.user.name ? ` como ${info.user.name}` : ''}. Tus registros se sincronizan.`);
+  if (!info.user && info.status === 'signed-out' && wasSignedIn) render();
+  if (view === 'hoy' && !state.onboarded) render();
+  wasSignedIn = !!info.user;
+});
+
+initSync({
+  getState: () => state,
+  today: () => today,
+  applyRemote(merged, first) {
+    const had = Object.values(state.days).filter((d) => d.status).length;
+    state = { ...merged, theme: state.theme };
+    saveState(state);
+    stats = computeStats(state, today);
+    render();
+    const now = Object.values(state.days).filter((d) => d.status).length;
+    if (first && now > had) toast(`Se cargaron ${plural(now - had, 'día', 'días')} desde tu cuenta.`);
+  },
+});
 
 if ('serviceWorker' in navigator && !window.__AYUNO_PREVIEW__ && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});

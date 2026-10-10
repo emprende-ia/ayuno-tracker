@@ -612,6 +612,33 @@ main {
 .field-error { font-size: 13px; color: var(--md-sys-color-error); }
 .meal-form { display: flex; flex-direction: column; gap: 10px; }
 
+/* ---------- Sincronización ---------- */
+
+.sync-btn[data-tone="ok"] { color: var(--md-sys-color-primary); }
+.sync-btn[data-tone="error"] { color: var(--md-sys-color-error); }
+@media (prefers-reduced-motion: no-preference) {
+  .sync-btn[data-tone="busy"] .ms { animation: pulse 1.4s var(--effects) infinite; }
+}
+.account { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 44px; height: 44px; border-radius: 22px; flex: none;
+  display: grid; place-items: center;
+  background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
+  font-size: 20px; font-weight: 700;
+}
+.account-text { min-width: 0; }
+.account-text p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-name { font-weight: 650; }
+.sync-line { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--md-sys-color-on-surface-variant); }
+.sync-line .ms { font-size: 20px; }
+.sync-line[data-tone="ok"] { color: var(--md-sys-color-primary); }
+.sync-line[data-tone="error"] { color: var(--md-sys-color-error); }
+.set-group .btn.text { align-self: flex-start; }
+.link-btn {
+  appearance: none; border: 0; background: none; padding: 0; cursor: pointer;
+  color: var(--md-sys-color-primary); font: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 2px;
+}
+
 /* ---------- Snackbar ---------- */
 
 .snackbar {
@@ -655,6 +682,7 @@ main {
 @keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes sheet-out { to { transform: translateY(32px); opacity: 0; } }
 @keyframes fade-in { from { opacity: 0; } }
+@keyframes pulse { 50% { opacity: 0.45; } }
 
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; }
 

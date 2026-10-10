@@ -1,6 +1,6 @@
 // Service worker: la app funciona sin conexión después de la primera visita.
 // Sube VERSION cada vez que publiques cambios para que los teléfonos tomen la nueva versión.
-const VERSION = 'ayuno-v1.2.0';
+const VERSION = 'ayuno-v1.3.0';
 const SHELL = [
   './',
   './index.html',
@@ -11,6 +11,8 @@ const SHELL = [
   './js/streaks.js',
   './js/store.js',
   './js/shapes.js',
+  './js/sync.js',
+  './js/firebase-config.js',
   './manifest.webmanifest',
   './icons/favicon.svg',
   './icons/favicon-48.png',
@@ -35,6 +37,20 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // SDK de Firebase: las URLs llevan versión, así que la copia guardada sirve siempre
+  if (url.hostname === 'www.gstatic.com' && url.pathname.startsWith('/firebasejs/')) {
+    e.respondWith(
+      caches.open(FONTS).then(async (cache) => {
+        const hit = await cache.match(req);
+        if (hit) return hit;
+        const res = await fetch(req);
+        if (res.ok) cache.put(req, res.clone());
+        return res;
+      }),
+    );
+    return;
+  }
 
   // Fuentes de Google: usa la copia guardada y actualízala en segundo plano
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {

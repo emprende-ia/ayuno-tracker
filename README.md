@@ -50,15 +50,44 @@ Si un día terminas de comer más tarde, toca **Ajustar mi última comida** y el
 
 Después de la primera visita funciona sin conexión.
 
+## Sincronización entre dispositivos
+
+En **Ajustes → Sincronización** inicia sesión con Google. Tus registros se guardan en Firebase (Cloud Firestore) y aparecen en todos los dispositivos donde entres con la misma cuenta.
+
+- Funciona sin conexión: lo que marques se guarda en el dispositivo y se sube cuando vuelve el internet.
+- Si el mismo día se registró distinto en dos dispositivos, gana el cambio más reciente. Los borrados también se sincronizan.
+- Un dispositivo nuevo primero descarga lo que hay en tu cuenta y después sube lo suyo, así que nunca borra la nube.
+- El ícono de nube en la barra superior muestra el estado: sincronizado, subiendo cambios, sin conexión o con error.
+- La app sigue funcionando sin cuenta, solo en el dispositivo.
+
+### Configuración de Firebase (ya hecha para este proyecto)
+
+- `js/firebase-config.js` tiene los datos del proyecto `ayuno-tracker-618ff`. No son secretos: identifican al proyecto y lo que protege los datos son las reglas.
+- **Authentication:** proveedor Google activado y `emprende-ia.github.io` en *Authorized domains*.
+- **Firestore (Standard, `(default)`):** un documento por persona en `users/{uid}`, con estas reglas:
+
+  ```
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{uid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+  ```
+
+- Plan Spark (gratis). Cada registro es una escritura, muy por debajo del límite diario.
+
 ## Tus datos
 
-Los registros se guardan solo en el navegador de tu dispositivo (`localStorage`). No hay servidor ni cuentas. Desde **Ajustes** puedes:
+Los registros se guardan en el navegador de tu dispositivo (`localStorage`) y, si inicias sesión, también en tu cuenta de Firebase. Desde **Ajustes** puedes:
 
 - **Exportar copia:** descarga un `.json` con todo tu historial.
 - **Importar copia:** restaura ese archivo en otro teléfono o navegador.
 - **Inicio del registro:** cambia la fecha desde la que cuentan tus rachas.
 
-Si borras los datos del navegador o desinstalas la app, se pierde el historial; exporta una copia de vez en cuando.
+Sin sesión iniciada, si borras los datos del navegador o desinstalas la app se pierde el historial. Con sesión iniciada queda guardado en tu cuenta.
 
 ## Desarrollo local
 
@@ -79,7 +108,9 @@ css/tokens.css          Colores M3 (claro y oscuro) generados desde la semilla v
 css/app.css             Componentes, formas, movimiento y diseño adaptable
 js/schedule.js          Horario del plan y fase actual (ayuno, ventana, intenso, descanso)
 js/streaks.js           Rachas, semanas y protectores calculados desde los registros
-js/store.js             Guardado local y copias de respaldo
+js/store.js             Guardado local, copias de respaldo y unión de datos entre dispositivos
+js/sync.js              Inicio de sesión con Google y sincronización con Firestore
+js/firebase-config.js   Datos del proyecto de Firebase
 js/shapes.js            Indicador circular ondulado y formas festoneadas
 js/app.js               Interfaz y eventos
 sw.js                   Funcionamiento sin conexión
